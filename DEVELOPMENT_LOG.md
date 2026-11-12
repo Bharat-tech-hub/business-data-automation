@@ -1,5 +1,28 @@
 ﻿# Development Log
 
+## Milestone 2: Configuration and logging foundation (complete)
+
+**Date:** 2026-11-12
+
+### Completed
+- `config/settings.py`: frozen, validated `Settings` dataclass (paths, 50 MB upload limit, `.csv`/`.xlsx` allowed, logging options) plus `is_extension_allowed()`.
+- `src/logger.py`: console and rotating-file logging, idempotent `setup_logging()`, `get_logger()`, `shutdown_logging()`.
+- `tests/test_config.py` and `tests/test_logger.py`: 29 tests, all passing (Python 3.12.10, pytest 9.2.0).
+- Manual check: a demo message appeared on the console and in `logs/app.log`; the log file is git-ignored.
+
+### Decisions
+- No `pytest.ini`; run tests with `python -m pytest`, not bare `pytest`.
+- Plain Python settings module; no PyYAML.
+- Upload limit defaults to 50 MB and is configurable.
+
+### Pending
+- LICENSE decision (deferred; revisit before Milestone 13).
+- Dataset: download the UCI Online Retail file into `data/raw/` before Milestone 3.
+
+---
+
+# Development Log
+
 ## Milestone 1: Environment and Project Initialization (complete)
 
 **Dates:** 2026-11-10 to 2026-11-12
