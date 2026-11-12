@@ -1,5 +1,33 @@
 ﻿# Development Log
 
+## Milestone 3: Data ingestion (complete)
+
+**Date:** 2026-11-13
+
+### Completed
+- `src/ingestion.py`: safe CSV/XLSX loading with filename sanitising, extension, size, content and required-column checks, a zip-bomb guard, UTF-8 with Latin-1 fallback, and custom exceptions (`IngestionError` and five subclasses). Returns `(DataFrame, IngestionResult)`.
+- `tests/test_ingestion.py`: 24 tests using small hand-built fixtures. Full suite: 58 passed, no warnings.
+- Real-file check: `Online Retail.xlsx` loads as 541,909 x 8 with no warnings.
+- Fixed a pandas deprecation (`ExcelFile.parse`) by reading the sheet with `pd.read_excel`.
+
+### Decisions
+- Ingestion does not parse types or dates; Milestone 4 validation counts bad values instead of crashing the load.
+- Business rules R1-R10 remain the source of truth (README, BUSINESS_RULES).
+
+### Known limitations
+- Duplicate CSV headers are renamed by pandas and are not flagged yet; Milestone 4 will check them.
+- The size limit is checked on bytes already in memory; Streamlit's own upload cap should also be set in Milestone 11.
+- My earlier test-count predictions were off by one (23 vs 24); counts above are from real runs.
+
+### Pending
+- Milestone 4: data validation.
+- Milestone 5: check for non-product stock codes that contain digits.
+- LICENSE decision (deferred; revisit before Milestone 13).
+
+---
+
+# Development Log
+
 ## Milestone 3: Data ingestion (in progress)
 
 **Date started:** 2026-11-12
