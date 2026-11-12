@@ -1,5 +1,29 @@
 ﻿# Development Log
 
+## Milestone 3: Data ingestion (in progress)
+
+**Date started:** 2026-11-12
+
+### Completed so far
+- Dataset `Online Retail.xlsx` (22.6 MB, 541,909 x 8) placed in `data/raw/` (git-ignored) and inspected twice, read-only.
+- Business rules R1-R10 approved and recorded in the README under BUSINESS_RULES (source of truth).
+- `src/schema.py`: required columns, text ID columns, cancellation prefix, non-product stock codes. `tests/test_schema.py`: 5 tests.
+
+### Decisions
+- `required_columns` is NOT added to `Settings`; it lives in `src/schema.py` (Milestone 2 code unchanged).
+- Rules R4, R5, R7 approved: zero-price rows excluded, fees on a separate line, exact duplicates removed (with a settings switch to keep them).
+- Amounts are labelled "currency units" because the dataset states no currency.
+- No product categories: contribution is by product only.
+
+### Pending
+- Step 3e: `src/ingestion.py` and tests.
+- Milestone 5: check for non-product stock codes that contain digits.
+- LICENSE decision (deferred; revisit before Milestone 13).
+
+---
+
+# Development Log
+
 ## Milestone 2: Configuration and logging foundation (complete)
 
 **Date:** 2026-11-12
