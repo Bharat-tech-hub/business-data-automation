@@ -232,3 +232,12 @@ def test_native_numeric_and_datetime_dtypes_accepted():
     df["InvoiceDate"] = pd.to_datetime(df["InvoiceDate"])
     assert df["Quantity"].dtype.kind == "i"
     assert validate(df).findings == []
+
+
+def test_c2_and_gift_codes_are_non_product():
+    rows = base_rows()
+    rows[0][1] = "C2"
+    rows[1][1] = "gift_0001_20"
+    report = validate(frame(rows))
+    assert report.get("non_product_codes").count == 2
+    assert report.sale_rows == 18

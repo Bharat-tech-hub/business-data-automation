@@ -16,7 +16,7 @@ import pandas as pd
 from src.logger import get_logger
 from src.schema import (
     CANCELLATION_PREFIX,
-    NON_PRODUCT_STOCK_CODES,
+    non_product_mask,
     REQUIRED_COLUMNS,
     TEXT_ID_COLUMNS,
 )
@@ -218,7 +218,7 @@ def validate(df: pd.DataFrame) -> ValidationReport:
     invoice = _as_text(df["InvoiceNo"])
     stock = _as_text(df["StockCode"]).str.upper()
     is_cancel = invoice.str.startswith(CANCELLATION_PREFIX).astype(bool)
-    is_non_product = stock.isin(list(NON_PRODUCT_STOCK_CODES))
+    is_non_product = non_product_mask(stock)
 
     _add(
         findings,

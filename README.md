@@ -54,7 +54,7 @@ This section is the single source of truth for how the dataset is interpreted. E
 | R2 | Return row | `InvoiceNo` starts with `C` (`Quantity < 0`). Reported as returns/cancellations. |
 | R3 | Non-sale adjustments | Non-`C` rows with `Quantity <= 0`, and negative-price rows. Kept in the audit trail with a flag; excluded from all KPIs. |
 | R4 | Zero-price sales | `UnitPrice = 0` with `Quantity > 0`. Excluded from KPIs; kept in cleaned data with a flag. |
-| R5 | Non-product codes | `POST`, `DOT`, `M`, `D`, `S`, `BANK CHARGES`, `AMAZONFEE`, `CRUK`, `B` (case-insensitive, so `m` is included). Flagged `is_product = False`, excluded from product analytics, and reported on a separate shipping/fees line. Codes containing digits are reviewed in Milestone 5. |
+| R5 | Non-product codes | `POST`, `DOT`, `M`, `D`, `S`, `BANK CHARGES`, `AMAZONFEE`, `CRUK`, `B`, `C2` (carriage), and any code starting with `GIFT_` (gift vouchers); case-insensitive, so `m` is included. Flagged `is_product = False`, excluded from product analytics, and reported on a separate shipping/fees line. Codes containing digits are reviewed in Milestone 5. |
 | R6 | Missing `CustomerID` | Rows are kept for revenue, orders, product and country analysis. Excluded only from customer-level analysis; the count is reported. |
 | R7 | Exact duplicates | Removed, with row count and revenue impact in the audit trail. A settings switch will allow keeping them. Caveat: an identical repeated line could be a genuine double entry. |
 | R8 | Missing `Description` | Kept and shown as "(no description)". The product key is `StockCode`. |

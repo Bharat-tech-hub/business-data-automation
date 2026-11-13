@@ -37,3 +37,18 @@ def test_known_codes_and_prefix():
     assert {"POST", "DOT", "M", "BANK CHARGES"} <= NON_PRODUCT_STOCK_CODES
     assert "m".upper() in NON_PRODUCT_STOCK_CODES
     assert CANCELLATION_PREFIX == "C"
+
+
+def test_non_product_mask_codes_prefix_and_case():
+    import pandas as pd
+    from src.schema import non_product_mask
+
+    codes = pd.Series(["POST", "post", "C2", "gift_0001_20", "85123A", "DCGSSBOY", None, 22423])
+    assert non_product_mask(codes).tolist() == [True, True, True, True, False, False, False, False]
+
+
+def test_c2_and_gift_prefix_are_configured():
+    from src.schema import NON_PRODUCT_CODE_PREFIXES
+
+    assert "C2" in NON_PRODUCT_STOCK_CODES
+    assert NON_PRODUCT_CODE_PREFIXES == ("GIFT_",)

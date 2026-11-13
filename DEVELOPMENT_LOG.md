@@ -1,5 +1,34 @@
 ﻿# Development Log
 
+## Milestone 5 (step 5b): Rule R5 extended (complete)
+
+**Date:** 2026-11-13
+
+### Completed
+- Four read-only inspections of `Online Retail.xlsx` settled the cleaning rules.
+- `src/schema.py`: R5 now includes `C2` (carriage) and the `GIFT_` prefix (vouchers), via one shared helper `non_product_mask()` so validation and cleaning cannot disagree.
+- `src/validation.py` now uses `non_product_mask()`. README R5 row updated.
+- Tests: 85 passed (3 new). Real file: non-product rows 2,946; candidate sale rows 527,761; not blocking.
+
+### Findings for step 5c (cleaning)
+- `StockCode`: 487,036 ints and 54,873 strings; no float artefacts. 1,977 rows have lowercase letters; 112 codes have more than one spelling. Upper-casing merges them.
+- `CustomerID`: no non-integer values, so it converts to integer text safely.
+- `Description`: 113,452 rows (about 21%) carry leading/trailing whitespace; one description is a stray number (`20713`). Strip, convert to text, keep case.
+- Up to 8 description variants per code. Product-name rule: most frequent stripped description per `StockCode`, kept as a separate lookup; rows are not rewritten.
+- Near-duplicates (5,270) vs exact (5,268): R7 stays on exact duplicates, measured after normalisation, with both counts logged.
+
+### Decisions
+- R7 "keep duplicates" switch is a module constant in the cleaning module; `config/settings.py` unchanged.
+
+### Pending
+- Step 5c: `src/cleaning.py`, audit trail, tests, and tidying the README R5 sentence about digit codes.
+- Streamlit upload cap (Milestone 11).
+- LICENSE decision (deferred; revisit before Milestone 13).
+
+---
+
+# Development Log
+
 ## Milestone 4: Data validation (complete)
 
 **Date:** 2026-11-13
