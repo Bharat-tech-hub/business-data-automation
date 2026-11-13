@@ -1,5 +1,32 @@
 ﻿# Development Log
 
+## Milestone 4: Data validation (complete)
+
+**Date:** 2026-11-13
+
+### Completed
+- `src/validation.py`: `validate(df)` returns a `ValidationReport` of `Finding`s classified as blocking, warning or info. It checks missing values, exact duplicates, unusable dates/quantities/prices, duplicate headers, mixed-type ID columns, and the BUSINESS_RULES categories (R2, R3, R4, R5, R6, R8). It never modifies the input.
+- `tests/test_validation.py`: 24 tests on 20-row hand-built fixtures. Full suite: 82 passed, no warnings.
+- Real-file check (`Online Retail.xlsx`, 541,909 rows): not blocking; 527,933 candidate sale rows; counts match the inspection (duplicates 5,268; missing CustomerID 135,080; missing Description 1,454; cancelled 9,288; non-cancelled non-positive quantity 1,336; zero price with positive quantity 1,179; negative price 2; non-product codes 2,768).
+
+### Decisions
+- Blocking threshold is 5% (constant `BLOCKING_THRESHOLD` in `src/validation.py`); `config/settings.py` unchanged. Exactly 5% is a warning, above 5% blocks.
+- Missing or unparseable `InvoiceDate`, `Quantity`, `UnitPrice` are reported together as "unusable_*".
+
+### Findings for Milestone 5
+- `StockCode` is mixed-type in 54,873 rows (10.1%) and `InvoiceNo` in 9,291 rows. Cleaning must convert both to text without float artefacts (e.g. `22423.0`).
+- `CustomerID` is float64 because of nulls; it must become text like `17850`, not `17850.0`.
+- Still to do: check for non-product stock codes that contain digits (R5 note).
+
+### Pending
+- Milestone 5: data cleaning and audit trail.
+- Streamlit upload cap (Milestone 11).
+- LICENSE decision (deferred; revisit before Milestone 13).
+
+---
+
+# Development Log
+
 ## Milestone 3: Data ingestion (complete)
 
 **Date:** 2026-11-13
