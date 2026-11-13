@@ -1,5 +1,54 @@
 ﻿# Development Log
 
+## Milestone 8: Advanced analytics (complete)
+
+**Date:** 2026-11-14
+
+### Completed
+- `src/analytics.py`: `product_performance`, `country_performance`, `rfm_table`, `spend_concentration`, `monthly_trend`, `quarterly_trend`, `observations`. All accept an optional `KpiFilter`.
+- `tests/test_analytics.py`: 9 tests on a hand-built frame. Full suite: 120 passed.
+- Real-file run reproduces the notebook: concentration 61.4%, 4,334 customers, same observation sentences. December 2011, 2010Q4 and 2011Q4 are flagged partial and excluded from growth.
+
+### Decisions
+- Partial periods are flagged, shown, and excluded from growth rates (approved "defaults"). Partial = data starts after the period's first day or ends before its last day, computed from the data.
+- RFM recency uses whole calendar days against the day after the last invoice.
+
+### Bugs found by tests
+- Test fixture used stock code "B", which is an R5 non-product code; the rule worked as designed. Fixture changed to a real product code.
+- Recency leaked time of day into day counts (floor of a fractional span). Fixed by normalising the last order date
+@'
+# Development Log
+
+## Milestone 8: Advanced analytics (complete)
+
+**Date:** 2026-11-14
+
+### Completed
+- `src/analytics.py`: `product_performance`, `country_performance`, `rfm_table`, `spend_concentration`, `monthly_trend`, `quarterly_trend`, `observations`. All accept an optional `KpiFilter`.
+- `tests/test_analytics.py`: 9 tests on a hand-built frame. Full suite: 120 passed.
+- Real-file run reproduces the notebook: concentration 61.4%, 4,334 customers, same observation sentences. December 2011, 2010Q4 and 2011Q4 are flagged partial and excluded from growth.
+
+### Decisions
+- Partial periods are flagged, shown, and excluded from growth rates (approved "defaults"). Partial = data starts after the period's first day or ends before its last day, computed from the data.
+- RFM recency uses whole calendar days against the day after the last invoice.
+
+### Bugs found by tests
+- Test fixture used stock code "B", which is an R5 non-product code; the rule worked as designed. Fixture changed to a real product code.
+- Recency leaked time of day into day counts (floor of a fractional span). Fixed by normalising the last order date to midnight.
+
+### Known limitations
+- The first months of the monthly table were not reviewed by me; the reasons for month-to-month swings are not explained by the data.
+- Q4 2010 is partial only because the data starts on 2010-12-01.
+
+### Pending
+- Milestone 9: visualization layer.
+- Streamlit upload cap (Milestone 11).
+- LICENSE decision (deferred; revisit before Milestone 13).
+
+---
+
+# Development Log
+
 ## Milestone 7: KPI engine (complete)
 
 **Date:** 2026-11-14
