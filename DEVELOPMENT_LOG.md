@@ -1,5 +1,33 @@
 ﻿# Development Log
 
+## Milestone 9: Visualization layer (complete)
+
+**Date:** 2026-11-14
+
+### Completed
+- `src/visualization.py`: six static (Matplotlib `Figure`) and five interactive (Plotly) chart functions. They cover monthly revenue with partial months in a lighter colour, top products, country revenue (optionally excluding the largest market), weekday/hour, customer spend (static only, log scale) and RFM. All accept a `KpiFilter` and return a "No data for the selected filters" figure when empty.
+- `tests/test_visualization.py`: 11 tests. Full suite: 131 passed.
+- All six real-file previews reviewed by eye: partial month is lighter, labels readable, Saturday empty, country chart excludes the UK, distributions consistent with the notebook figures.
+
+### Decisions
+- One module with `static_*` and `interactive_*` functions (approved "defaults").
+- Static figures use `matplotlib.figure.Figure`, not `pyplot`.
+- PDF charts will use the static functions; no `kaleido` was added.
+
+### Known limitations
+- Tests check structure, not appearance.
+- Axes use scientific notation (1e6) and unformatted numbers; comma formatting is planned for Milestone 10.
+- Customer spend has no interactive version yet.
+
+### Pending
+- Milestone 10: Excel and PDF reporting (including axis number formatting).
+- Streamlit upload cap (Milestone 11).
+- LICENSE decision (deferred; revisit before Milestone 13).
+
+---
+
+# Development Log
+
 ## Milestone 8: Advanced analytics (complete)
 
 **Date:** 2026-11-14
