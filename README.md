@@ -65,3 +65,21 @@ This section is the single source of truth for how the dataset is interpreted. E
 
 - `InvoiceNo`, `StockCode` and `CustomerID` are handled as text, with whitespace stripped; `StockCode` is upper-cased. Every change is counted in the audit trail.
 - `Country` values are kept as supplied. `Unspecified` and `European Community` are not real countries, and `EIRE`/`RSA` are non-standard labels; none are merged or renamed.
+
+### KPI definitions (Milestone 7, implemented in `src/kpis.py`)
+
+All KPIs use the cleaned data. Sale rows are `is_sale` (R1); return rows are `is_cancelled` (R2).
+
+| KPI | Formula |
+|---|---|
+| Gross sales | Sum of `LineTotal` over sale rows |
+| Returns value | Sum of `LineTotal` over return rows (negative) |
+| Net revenue | Gross sales + returns value |
+| Orders | Distinct `InvoiceNo` among sale rows |
+| Units sold | Sum of `Quantity` over sale rows |
+| Average order value | Gross sales / orders |
+| Average selling price | Gross sales / units sold (revenue per unit, weighted) |
+| Return rate | abs(returns value) / gross sales; a ratio of totals, since returns are not linked to original sales (R10) |
+| Shipping and fees | Positive-quantity, positive-price, non-cancelled rows with a non-product code (R5), reported separately |
+
+Filters (start date, end date inclusive of the whole day, countries) apply to every function. Empty selections return zeros.

@@ -1,5 +1,31 @@
 ﻿# Development Log
 
+## Milestone 7: KPI engine (complete)
+
+**Date:** 2026-11-14
+
+### Completed
+- `src/kpis.py`: `KpiFilter`, `apply_filter`, `compute_kpis` (-> `KpiSummary`), `revenue_by_country`, `revenue_by_product` (with cumulative share; no categories exist), `monthly_revenue`, `customer_frequency`, `repeat_customer_share`.
+- `tests/test_kpis.py`: 11 tests on a hand-built frame. Full suite: 111 passed.
+- Real-file run reproduces the notebook: gross 10,247,219.32; returns -893,979.73; net 9,353,239.59; 19,773 orders; AOV 518.24; return rate 8.72%; fees 394,891.48; 4,334 customers, 65.3% repeat. New: 5,561,387 units; average selling price 1.84.
+
+### Decisions
+- Average selling price = gross sales / units sold (approved "defaults"). Recorded in the README.
+- Filters live in one `apply_filter` used by every function.
+
+### Known limitations
+- Units total and ASP were not cross-checked independently.
+- Return rate is a ratio of totals (R10).
+
+### Pending
+- Milestone 8: advanced analytics.
+- Streamlit upload cap (Milestone 11).
+- LICENSE decision (deferred; revisit before Milestone 13).
+
+---
+
+# Development Log
+
 ## Milestone 6: Exploratory data analysis notebook (complete)
 
 **Date:** 2026-11-14
