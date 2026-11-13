@@ -1,5 +1,31 @@
 ﻿# Development Log
 
+## Milestone 5: Data cleaning and audit trail (complete)
+
+**Date:** 2026-11-13
+
+### Completed
+- `src/cleaning.py`: `clean(df)` returns `(cleaned, CleaningReport)`. Steps: strip whitespace, convert IDs to text (`CustomerID` as integer text), upper-case `StockCode`, parse date/number columns (drop unusable rows), fill missing descriptions (R8), remove exact duplicates (R7, constant `REMOVE_DUPLICATES`), add `is_cancelled`, `is_product`, `is_sale`, `has_customer`, `LineTotal`, `InvoiceMonth`. Also `build_product_names()` and `save_processed()`. The input is never modified.
+- `tests/test_cleaning.py`: 15 tests. Full suite: 100 passed.
+- Real-file run: 541,909 -> 536,641 rows; whitespace cells 113,452; StockCode upper-cased 1,977; descriptions filled 1,454; duplicates removed 5,268; unusable rows 0; 522,540 sale rows.
+
+### Decisions
+- Product name = most frequent stripped description per StockCode, as a separate lookup; rows are not rewritten.
+- Missing CustomerID is stored as an empty string with `has_customer = False`.
+
+### Known limitations
+- `save_processed()` exists but nothing calls it yet; the dashboard and `run.py` will.
+- My test-count predictions were off by one again (16 vs 15); counts above are from real runs.
+
+### Pending
+- Milestone 6: exploratory data analysis (notebook).
+- Streamlit upload cap (Milestone 11).
+- LICENSE decision (deferred; revisit before Milestone 13).
+
+---
+
+# Development Log
+
 ## Milestone 5 (step 5b): Rule R5 extended (complete)
 
 **Date:** 2026-11-13
