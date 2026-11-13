@@ -1,5 +1,23 @@
 ﻿# Development Log
 
+## Milestone 6 (step 6a): ipykernel added (complete)
+
+**Date:** 2026-11-13
+
+### Completed
+- Approved by you and installed: `ipykernel` 7.4.0 (IPython 9.18.1). Justification: lets VS Code run `.ipynb` notebooks with the project's `.venv`. No `jupyter`, `jupyterlab` or `notebook` was installed, so no web server is added.
+- `pip check`: no broken requirements. `verify_environment.py`: ten OK. Tests: 100 passed.
+- `requirements.txt` re-pinned: 51 -> 73 lines, 22 insertions, no existing version changed.
+
+### Pending
+- Step 6b: generate `notebooks/01_eda.ipynb` and check the kernel in VS Code.
+- Streamlit upload cap (Milestone 11).
+- LICENSE decision (deferred; revisit before Milestone 13).
+
+---
+
+# Development Log
+
 ## Milestone 5: Data cleaning and audit trail (complete)
 
 **Date:** 2026-11-13
