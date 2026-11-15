@@ -1,5 +1,35 @@
 ﻿# Development Log
 
+## Milestone 11, step 11a: Dashboard skeleton and Executive overview (complete)
+
+**Date:** 2026-11-16
+
+### Completed
+- `app/streamlit_app.py`: cached pipeline (ingest, validate, clean), data source (upload or `data/raw`), sidebar page selector, date and country filters feeding a `KpiFilter`, and the Executive overview page (eight KPI cards, interactive monthly chart, computed observations). Other pages are placeholders.
+- `run.py` launcher, `app/__init__.py`, and `.streamlit/config.toml` (50 MB upload cap, telemetry off).
+- Verified on the real file: unfiltered KPIs match every earlier run; the France filter gives 184,493.00 gross sales and 382 orders, matching the country table.
+
+### Decisions
+- One file with a sidebar page selector (approved "defaults"); `.streamlit/config.toml` approved.
+- KPI cards laid out as four rows of two so full values are visible.
+- `use_container_width` replaced by `width="stretch"` (deprecated in this Streamlit version).
+
+### Pitfalls
+- `Set-Content -Encoding utf8` in Windows PowerShell 5 writes a BOM, which breaks TOML. The config was rewritten without a BOM.
+
+### Known limitations
+- Growth percentages on small filtered selections swing widely (e.g. France +314.6%).
+- The France `units_sold` cross-check and the absence of Streamlit warnings were not confirmed.
+
+### Pending
+- Step 11b: remaining six pages.
+- LICENSE decision (deferred; revisit before Milestone 13).
+- PDF title and Excel sheet checks from Milestone 10.
+
+---
+
+# Development Log
+
 ## Milestone 10, step 10b: PDF report (complete)
 
 **Date:** 2026-11-15
