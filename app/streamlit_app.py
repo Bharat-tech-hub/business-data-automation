@@ -13,10 +13,10 @@ import pandas as pd
 import streamlit as st
 
 from config.settings import settings
-from src.analytics import monthly_trend, observations, product_performance, quarterly_trend
+from src.analytics import country_performance, monthly_trend, observations, product_performance, quarterly_trend, spend_concentration
 from src.cleaning import build_product_names, clean
 from src.ingestion import IngestionError, load_bytes
-from src.kpis import KpiFilter, compute_kpis
+from src.kpis import KpiFilter, apply_filter, compute_kpis, customer_frequency, repeat_customer_share
 from src.logger import setup_logging
 from src import visualization as viz
 from src.validation import validate
@@ -119,6 +119,45 @@ def page_products(df: pd.DataFrame, names, flt: KpiFilter) -> None:
     st.caption("Shipping, fees and vouchers are excluded from product tables (rule R5).")
 
 
+def page_customers(df: pd.DataFrame, names, flt: KpiFilter) -> None:
+    st.title("Customer analytics")
+    freq = customer_frequency(df, flt)
+    if freq.empty:
+        st.info("No identified customers for the selected filters.")
+        return
+    c = st.columns(3)
+    c[0].metric("Identified customers", f"{len(freq):,}")
+    c[1].metric("Repeat customers", f"{repeat_customer_share(df, flt):.1%}")
+    c[2].metric("Top 10% share of spend", f"{spend_concentration(df, flt):.1%}")
+    d = apply_filter(df, flt)
+    sales = d[d["is_sale"]]
+    missing = int((~sales["has_customer"]).sum())
+    st.caption(f"{missing:,} sale rows ({missing / max(len(sales), 1):.1%}) have no CustomerID and are excluded here (rule R6).")
+    st.subheader("Spend per customer")
+    st.pyplot(viz.static_customer_spend(df, flt))
+    st.subheader("Recency vs frequency")
+    st.plotly_chart(viz.interactive_rfm(df, flt), width="stretch")
+    st.subheader("Top 20 customers by spend")
+    top = freq.sort_values("spend", ascending=False).head(20)
+    st.dataframe(top.style.format({"spend": "{:,.2f}"}), width="stretch")
+
+
+def page_geography(df: pd.DataFrame, names, flt: KpiFilter) -> None:
+    st.title("Geographic analytics")
+    table = country_performance(df, flt)
+    if table.empty:
+        st.info("No sales for the selected filters.")
+        return
+    if len(table) == 1:
+        st.caption(f"Only one country is selected: {table.index[0]}.")
+    exclude = st.checkbox("Exclude the largest market from the chart", value=len(table) > 1, disabled=len(table) < 2)
+    st.plotly_chart(viz.interactive_country_revenue(df, flt, exclude_top=exclude and len(table) > 1), width="stretch")
+    st.subheader("Revenue by country")
+    st.dataframe(table.style.format({"revenue": "{:,.2f}", "units": "{:,.0f}", "share": "{:.1%}",
+                                     "revenue_per_order": "{:,.2f}"}), width="stretch")
+    st.caption("Country labels are shown as supplied (e.g. EIRE, RSA, Unspecified).")
+
+
 def main() -> None:
     source = get_source()
     page = st.sidebar.radio("Page", PAGES)
@@ -144,6 +183,10 @@ def main() -> None:
         page_sales(df, names, flt)
     elif page == "Product analytics":
         page_products(df, names, flt)
+    elif page == "Customer analytics":
+        page_customers(df, names, flt)
+    elif page == "Geographic analytics":
+        page_geography(df, names, flt)
     else:
         st.title(page)
         st.info("This page is coming in the next step.")

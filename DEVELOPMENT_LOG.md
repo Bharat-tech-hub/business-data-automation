@@ -1,5 +1,27 @@
 ﻿# Development Log
 
+## Milestone 11, step 11b-2a: Customer and Geographic pages (complete)
+
+**Date:** 2026-11-16
+
+### Completed
+- `app/streamlit_app.py`: `page_customers` (customer cards, spend histogram, RFM scatter, top-20 table, missing-CustomerID note) and `page_geography` (exclude-largest-market checkbox, country table with revenue per order). Routing added.
+- Verified unfiltered on the real file: 4,334 customers, 65.3% repeat, top 10% = 61.4%, 131,387 sale rows without CustomerID; country table matches earlier runs.
+- Tests: 147 passed.
+
+### Known limitations
+- The RFM chart's log-axis tick labels are hard to read (planned fix).
+- France views of these pages, the unfiltered Product page and Streamlit terminal warnings were not confirmed.
+
+### Pending
+- Step 11b-2b: Data quality and Report downloads pages.
+- LICENSE decision (deferred; revisit before Milestone 13).
+- PDF title and Excel sheet checks from Milestone 10.
+
+---
+
+# Development Log
+
 ## Milestone 11, step 11b-1: Sales and Product analytics pages (complete)
 
 **Date:** 2026-11-16
