@@ -1,5 +1,32 @@
 ﻿# Development Log
 
+## Milestone 10, step 10b: PDF report (complete)
+
+**Date:** 2026-11-15
+
+### Completed
+- `src/reporting.py`: `build_pdf(df, ctx)` (A4, reportlab): title, report date, filters, KPI table, computed observations, notes, four static charts, top-10 products and countries tables, and a Data quality section when validation/cleaning reports are supplied. Text is XML-escaped.
+- `src/visualization.py`: comma-formatted money axes on static charts (commit 9afa43a).
+- `tests/test_pdf.py`: 6 structural tests. Full suite: 147 passed.
+- Real-file PDF reviewed by eye: KPIs, observations, charts, tables and data-quality tables match earlier runs.
+
+### Decisions
+- A4 page size (approved "defaults").
+- No PDF text reader (`pypdf`) was added, so tests check structure, not the text of each number.
+
+### Known limitations
+- The "Data quality" heading can be separated from its tables across a page break.
+- Whether the title is clipped on page 1 was not confirmed (screenshot crop).
+- Products, Countries and Customers Excel sheets were not reviewed by eye.
+
+### Pending
+- Milestone 11: Streamlit dashboard (including the upload size cap).
+- LICENSE decision (deferred; revisit before Milestone 13).
+
+---
+
+# Development Log
+
 ## Milestone 10, step 10a: Excel report (complete)
 
 **Date:** 2026-11-15

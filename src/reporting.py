@@ -249,3 +249,108 @@ def save_report(data: bytes, file_name: str, directory: Path | None = None) -> P
     target = target_dir / safe
     target.write_bytes(data)
     return target
+
+
+# ---------------------------------------------------------------- PDF helpers
+from xml.sax.saxutils import escape as _esc
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import cm
+from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+from src import visualization as viz
+
+_STYLES = getSampleStyleSheet()
+
+
+def _money(value: float) -> str:
+    return f"{value:,.2f}"
+
+
+def _para(text: str, style: str = "BodyText") -> Paragraph:
+    return Paragraph(_esc(str(text)), _STYLES[style])
+
+
+def _fig_to_image(fig, width_cm: float = 17.0) -> Image:
+    """Render a Matplotlib Figure to an in-memory PNG and wrap it for the PDF."""
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=150)
+    buf.seek(0)
+    w, h = fig.get_size_inches()
+    return Image(buf, width=width_cm * cm, height=width_cm * cm * h / w)
+
+
+def _pdf_table(rows: list[list[str]], col_widths: list[float] | None = None) -> Table:
+    """A table whose first row is a shaded header; cell text is escaped."""
+    data = [[Paragraph(_esc(str(c)), _STYLES["BodyText"]) for c in r] for r in rows]
+    table = Table(data, colWidths=col_widths, repeatRows=1)
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#DCE6F1")),
+        ("GRID", (0, 0), (-1, -1), 0.4, colors.grey),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+    ]))
+    return table
+
+
+def build_pdf(df: pd.DataFrame, ctx: ReportContext | None = None) -> bytes:
+    """Build the PDF report (A4) and return it as bytes."""
+    ctx = ctx or ReportContext()
+    flt = ctx.flt
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=2 * cm, rightMargin=2 * cm,
+                            topMargin=2 * cm, bottomMargin=2 * cm, title="Business Sales Report")
+    story = [_para("Business Sales Report", "Title"),
+             _para(f"Report date: {ctx.report_date or date.today()}"), Spacer(1, 0.3 * cm),
+             _para("Filters", "Heading2")]
+    story += [_para(line) for line in describe_filter(flt)]
+
+    story += [Spacer(1, 0.3 * cm), _para("Key metrics (currency units)", "Heading2")]
+    rows = [["KPI", "Value"]]
+    for label, value, kind in kpi_rows(df, flt):
+        text = f"{value:.1%}" if kind == "pct" else (f"{value:,.0f}" if kind == "int" else _money(value))
+        rows.append([label, text])
+    story.append(_pdf_table(rows, [8 * cm, 5 * cm]))
+
+    story += [Spacer(1, 0.3 * cm), _para("Observations (computed from the data)", "Heading2")]
+    story += [_para("- " + line) for line in observations(df, ctx.names, flt)]
+    story += [Spacer(1, 0.3 * cm), _para("Notes", "Heading2")]
+    story += [_para("- " + line) for line in NOTES]
+
+    story += [Spacer(1, 0.4 * cm), _para("Charts", "Heading2"),
+              _fig_to_image(viz.static_monthly_revenue(df, flt)),
+              _fig_to_image(viz.static_top_products(df, ctx.names, flt), 15.0),
+              _fig_to_image(viz.static_country_revenue(df, flt, exclude_top=True), 15.0),
+              _fig_to_image(viz.static_weekday_hour(df, flt))]
+
+    story += [Spacer(1, 0.3 * cm), _para("Top 10 products by revenue", "Heading2")]
+    p = revenue_by_product(df, ctx.names, flt).head(10)
+    prow = [["Code", "Product", "Revenue", "Units"]]
+    for code, r in p.iterrows():
+        prow.append([code, r.get("name", ""), _money(r["revenue"]), f"{r['units']:,.0f}"])
+    story.append(_pdf_table(prow, [2.5 * cm, 8 * cm, 3.5 * cm, 3 * cm]))
+
+    story += [Spacer(1, 0.3 * cm), _para("Top 10 countries by revenue", "Heading2")]
+    c = revenue_by_country(df, flt).head(10)
+    crow = [["Country", "Revenue", "Orders", "Share"]]
+    for country, r in c.iterrows():
+        crow.append([country, _money(r["revenue"]), f"{r['orders']:,.0f}", f"{r['share']:.1%}"])
+    story.append(_pdf_table(crow, [5 * cm, 4 * cm, 3 * cm, 3 * cm]))
+
+    if ctx.validation is not None or ctx.cleaning is not None:
+        story += [Spacer(1, 0.3 * cm), _para("Data quality", "Heading2")]
+        if ctx.validation is not None:
+            vrows = [["Severity", "Code", "Count", "Message"]]
+            for f in ctx.validation.findings:
+                vrows.append([f.severity.value, f.code, f"{f.count:,}", f.message])
+            story.append(_pdf_table(vrows, [2 * cm, 4.5 * cm, 2 * cm, 8.5 * cm]))
+            story.append(Spacer(1, 0.3 * cm))
+        if ctx.cleaning is not None:
+            arows = [["Cleaning step", "Affected", "Reason"]]
+            for e in ctx.cleaning.entries:
+                arows.append([e.step, f"{e.affected:,}", e.reason])
+            story.append(_pdf_table(arows, [4.5 * cm, 2.5 * cm, 10 * cm]))
+
+    doc.build(story)
+    return buffer.getvalue()
