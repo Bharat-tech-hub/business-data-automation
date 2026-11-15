@@ -1,5 +1,32 @@
 ﻿# Development Log
 
+## Milestone 10, step 10a: Excel report (complete)
+
+**Date:** 2026-11-15
+
+### Completed
+- `src/reporting.py`: `ReportContext`, `describe_filter`, `kpi_rows`, `build_excel` (sheets: Summary, Monthly with a native column chart, Products, Countries, Customers, Data quality), `save_report` (sanitised name, .xlsx/.pdf only, writes to `reports/`).
+- `tests/test_reporting.py`: 10 tests that read the generated workbook back and compare with hand-calculated KPIs. Full suite: 141 passed.
+- Real-file report reviewed in Excel: Summary KPIs, Monthly (13 months, chart) and Data quality (10 findings, 6 audit lines) match earlier runs. Fixed: wrapped long text on Summary; widened the `code` column on Data quality (not re-checked by eye).
+
+### Decisions
+- Module built in three small pastes because large terminal pastes were doubling.
+- Chart presence is not asserted in tests (openpyxl does not reliably load charts); checked by eye.
+
+### Known limitations
+- Products, Countries and Customers sheets were not reviewed by eye.
+- The Excel monthly chart does not colour the partial month; the `partial` column shows it.
+- Summary rows are taller than needed.
+
+### Pending
+- Step 10b: PDF report and axis number formatting in `src/visualization.py`.
+- Streamlit upload cap (Milestone 11).
+- LICENSE decision (deferred; revisit before Milestone 13).
+
+---
+
+# Development Log
+
 ## Milestone 9: Visualization layer (complete)
 
 **Date:** 2026-11-14
