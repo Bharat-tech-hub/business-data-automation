@@ -1,5 +1,30 @@
 ﻿# Development Log
 
+## Milestone 11, step 11b-1: Sales and Product analytics pages (complete)
+
+**Date:** 2026-11-16
+
+### Completed
+- `app/streamlit_app.py`: `page_sales` (interactive monthly chart, monthly and quarterly tables with partial flags and growth only between complete periods, weekday/hour chart) and `page_products` (top-N slider, top and bottom tables, products for 80% of revenue). Routing added.
+- Verified with the France filter: Overview matches the country table (184,493.00; 382 orders; 111,226 units); Sales growth values match the observation lines; weekday/hour charts rescale to the filter (Saturday empty); Product analytics shows 1,539 products and 384 for 80%, matching the observation lines.
+- Tests: 147 passed.
+
+### Pitfalls
+- A here-string inserted before `def main()` lost its trailing newline and glued the next line on, causing an IndentationError. Fixed by splitting the line.
+
+### Known limitations
+- Product analytics unfiltered view and Streamlit terminal warnings were not confirmed.
+- Bottom-products table shows one-off tiny sales; it illustrates the long tail only.
+
+### Pending
+- Step 11b-2: Customer, Geographic, Data quality and Report downloads pages.
+- LICENSE decision (deferred; revisit before Milestone 13).
+- PDF title and Excel sheet checks from Milestone 10.
+
+---
+
+# Development Log
+
 ## Milestone 11, step 11a: Dashboard skeleton and Executive overview (complete)
 
 **Date:** 2026-11-16

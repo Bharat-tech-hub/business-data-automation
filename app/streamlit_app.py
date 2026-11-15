@@ -13,7 +13,7 @@ import pandas as pd
 import streamlit as st
 
 from config.settings import settings
-from src.analytics import monthly_trend, observations
+from src.analytics import monthly_trend, observations, product_performance, quarterly_trend
 from src.cleaning import build_product_names, clean
 from src.ingestion import IngestionError, load_bytes
 from src.kpis import KpiFilter, compute_kpis
@@ -83,6 +83,42 @@ def page_overview(df: pd.DataFrame, names, flt: KpiFilter) -> None:
         st.write("- " + line)
 
 
+def page_sales(df: pd.DataFrame, names, flt: KpiFilter) -> None:
+    st.title("Sales analytics")
+    monthly = monthly_trend(df, flt)
+    if monthly.empty:
+        st.info("No sales for the selected filters.")
+        return
+    st.plotly_chart(viz.interactive_monthly_revenue(df, flt), width="stretch")
+    st.subheader("Monthly gross sales")
+    st.dataframe(monthly.rename(columns={"revenue": "gross_sales"}).style.format(
+        {"gross_sales": "{:,.2f}", "growth": "{:+.1%}"}, na_rep="-"), width="stretch")
+    st.caption("Partial months are shown but excluded from growth rates.")
+    st.subheader("Quarterly gross sales")
+    st.dataframe(quarterly_trend(df, flt).style.format(
+        {"revenue": "{:,.2f}", "growth": "{:+.1%}"}, na_rep="-"), width="stretch")
+    st.subheader("Weekday and hour patterns")
+    st.plotly_chart(viz.interactive_weekday_hour(df, flt), width="stretch")
+
+
+def page_products(df: pd.DataFrame, names, flt: KpiFilter) -> None:
+    st.title("Product analytics")
+    n = st.slider("Number of products", 5, 50, 10)
+    perf = product_performance(df, names, flt, n=n)
+    if perf["products"] == 0:
+        st.info("No product sales for the selected filters.")
+        return
+    st.metric("Products sold", f"{perf['products']:,}")
+    st.write(f"{perf['products_for_80pct']:,} products make up 80% of product revenue.")
+    st.plotly_chart(viz.interactive_top_products(df, names, flt, n=n), width="stretch")
+    fmt = {"revenue": "{:,.2f}", "units": "{:,.0f}", "share": "{:.1%}", "cumulative_share": "{:.1%}"}
+    st.subheader(f"Top {n} products")
+    st.dataframe(perf["top"].style.format(fmt), width="stretch")
+    st.subheader(f"Bottom {n} products")
+    st.dataframe(perf["bottom"].style.format(fmt), width="stretch")
+    st.caption("Shipping, fees and vouchers are excluded from product tables (rule R5).")
+
+
 def main() -> None:
     source = get_source()
     page = st.sidebar.radio("Page", PAGES)
@@ -104,6 +140,10 @@ def main() -> None:
     flt = build_filter(df)
     if page == "Executive overview":
         page_overview(df, names, flt)
+    elif page == "Sales analytics":
+        page_sales(df, names, flt)
+    elif page == "Product analytics":
+        page_products(df, names, flt)
     else:
         st.title(page)
         st.info("This page is coming in the next step.")
