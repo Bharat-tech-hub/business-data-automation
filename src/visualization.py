@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from matplotlib.figure import Figure
+from matplotlib.ticker import FuncFormatter
 from plotly.subplots import make_subplots
 
 from src.analytics import monthly_trend, rfm_table
@@ -17,6 +18,12 @@ NO_DATA = "No data for the selected filters"
 MAIN_COLOR = "#1f77b4"
 PARTIAL_COLOR = "#aec7e8"
 WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+
+def _money_axis(ax, axis: str = "y") -> None:
+    """Show comma-separated numbers instead of scientific notation."""
+    fmt = FuncFormatter(lambda v, _: f"{v:,.0f}")
+    (ax.yaxis if axis == "y" else ax.xaxis).set_major_formatter(fmt)
 
 
 def _empty_static(title: str) -> Figure:
@@ -61,6 +68,7 @@ def static_monthly_revenue(df, flt: KpiFilter | None = None) -> Figure:
     ax.bar(m.index, m["revenue"], color=[PARTIAL_COLOR if p else MAIN_COLOR for p in m["partial"]])
     ax.set_title(title + " (lighter bar = partial month)")
     ax.set_ylabel("Currency units")
+    _money_axis(ax, "y")
     ax.tick_params(axis="x", rotation=60)
     fig.tight_layout()
     return fig
@@ -79,6 +87,7 @@ def static_top_products(df, names=None, flt: KpiFilter | None = None, n: int = 1
     ax.set_yticklabels(_product_labels(table))
     ax.set_title(title)
     ax.set_xlabel("Currency units")
+    _money_axis(ax, "x")
     fig.tight_layout()
     return fig
 
@@ -99,6 +108,7 @@ def static_country_revenue(df, flt: KpiFilter | None = None, exclude_top: bool =
     ax.set_yticklabels([str(c) for c in t.index])
     ax.set_title(title)
     ax.set_xlabel("Currency units")
+    _money_axis(ax, "x")
     fig.tight_layout()
     return fig
 
@@ -115,7 +125,9 @@ def static_weekday_hour(df, flt: KpiFilter | None = None) -> Figure:
     ax1.set_title("Revenue by weekday")
     ax1.tick_params(axis="x", rotation=45)
     ax1.set_ylabel("Currency units")
+    _money_axis(ax1, "y")
     ax2.bar(by_hour.index, by_hour.values, color=MAIN_COLOR)
+    _money_axis(ax2, "y")
     ax2.set_title("Revenue by hour of day")
     ax2.set_xlabel("Hour")
     fig.tight_layout()
