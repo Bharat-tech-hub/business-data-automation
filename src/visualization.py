@@ -162,6 +162,8 @@ def static_rfm(df, flt: KpiFilter | None = None) -> Figure:
     ax = fig.subplots()
     ax.scatter(r["recency_days"], r["frequency"], s=12, alpha=0.5, color=MAIN_COLOR)
     ax.set_yscale("log")
+    _money_axis(ax, "y")
+    ax.yaxis.set_minor_formatter(FuncFormatter(lambda v, _: ""))
     ax.set_title(title)
     ax.set_xlabel("Days since last order")
     ax.set_ylabel("Orders (log scale)")
@@ -231,5 +233,9 @@ def interactive_rfm(df, flt: KpiFilter | None = None) -> go.Figure:
         x=r["recency_days"].tolist(), y=r["frequency"].tolist(), mode="markers",
         text=[f"Customer {c}" for c in r.index], marker={"color": MAIN_COLOR, "opacity": 0.5, "size": 6},
     ))
-    fig.update_layout(title=title, xaxis_title="Days since last order", yaxis_title="Orders (log scale)", yaxis_type="log")
+    fig.update_layout(
+        title=title, xaxis_title="Days since last order",
+        yaxis_title="Orders (log scale)", yaxis_type="log",
+        yaxis_tickvals=[1, 2, 5, 10, 20, 50, 100, 200, 500], yaxis_tickformat=",d",
+    )
     return fig

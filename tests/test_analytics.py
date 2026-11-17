@@ -94,3 +94,11 @@ def test_observations_are_computed():
     assert any("440.00" in line for line in obs)
     assert any("largest market" in line for line in obs)
     assert any("2011-04" in line and "Partial" in line for line in obs)
+
+
+def test_observations_skip_largest_market_for_single_country():
+    df = make_df()
+    france_only = df[df["Country"] == "France"]
+    assert not any("largest market" in line for line in observations(france_only))
+    assert any("largest market" in line for line in observations(df))
+

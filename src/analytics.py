@@ -102,7 +102,8 @@ def observations(df, names=None, flt=None) -> list[str]:
         f"Returns are {abs(k.returns_value):,.2f}, or {k.return_rate:.1%} of gross sales.",
     ]
     c = country_performance(df, flt)
-    out.append(f"{c.index[0]} is the largest market with {c['share'].iloc[0]:.1%} of gross sales.")
+    if len(c) > 1:
+        out.append(f"{c.index[0]} is the largest market with {c['share'].iloc[0]:.1%} of gross sales.")
     p = product_performance(df, names, flt)
     out.append(f"{p['products_for_80pct']:,} of {p['products']:,} products make up 80% of product revenue.")
     out.append(f"The top 10% of identified customers account for {spend_concentration(df, flt):.1%} of customer spend.")
