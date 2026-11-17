@@ -1,5 +1,22 @@
 ﻿# Development Log
 
+## Milestone 11, step 11b-2b: Data quality and Report downloads pages (complete)
+
+**Date:** 2026-11-17
+
+### Completed
+- `app/streamlit_app.py`: `page_quality` (validation findings and cleaning audit trail) and `page_downloads` with a cached `_report_bytes` that builds the Excel and PDF reports for the current filter. Routing added.
+- Verified unfiltered and with Countries = France: both reports show the filter lines and match the dashboard (France: gross 184,493.00, 382 orders, 111,226 units, 384 of 1,539 products for 80%). Unfiltered: gross 10,247,219.32, 19,773 orders.
+- Streamlit terminal showed no warnings or errors during filter and download use.
+- Environment: Windows Smart App Control blocked pyarrow 26.0.1's `_compute` DLL, which broke pandas imports and pytest. pyarrow pinned to 22.0.0 in `requirements.txt`; 147 tests pass again. 
+
+### Known limitations
+- The RFM chart's log-axis tick labels are hard to read (planned fix).
+- With a single country selected, the observation "X is the largest market with 100.0%" is true but uninformative (planned tweak).
+- The unfiltered Product page and the Excel Products, Countries and Customers sheets were not reviewed by eye.
+
+
+
 ## Milestone 11, step 11b-2a: Customer and Geographic pages (complete)
 
 **Date:** 2026-11-16

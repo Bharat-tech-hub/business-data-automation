@@ -18,6 +18,7 @@ from src.cleaning import build_product_names, clean
 from src.ingestion import IngestionError, load_bytes
 from src.kpis import KpiFilter, apply_filter, compute_kpis, customer_frequency, repeat_customer_share
 from src.logger import setup_logging
+from src.reporting import ReportContext, build_excel, build_pdf
 from src import visualization as viz
 from src.validation import validate
 
@@ -158,6 +159,38 @@ def page_geography(df: pd.DataFrame, names, flt: KpiFilter) -> None:
     st.caption("Country labels are shown as supplied (e.g. EIRE, RSA, Unspecified).")
 
 
+def page_quality(extra: dict) -> None:
+    st.title("Data quality")
+    ing = extra["ingestion"]
+    st.write(f"**File:** {ing.file_name} | **Format:** {ing.file_format} | **Size:** {ing.size_bytes / 1024 / 1024:.1f} MB | "
+             f"**Rows:** {ing.rows:,} | **Columns:** {ing.columns}")
+    st.subheader("Validation findings")
+    st.dataframe(extra["validation"].to_frame(), width="stretch")
+    st.subheader("Cleaning audit trail")
+    st.dataframe(extra["cleaning"].to_frame(), width="stretch")
+    st.caption("Validation runs on the raw data; the audit trail shows every change made by cleaning.")
+
+
+@st.cache_data(show_spinner="Building report...")
+def _report_bytes(kind: str, start, end, countries: tuple, data: bytes, file_name: str) -> bytes:
+    df, _, validation, cleaning, names = run_pipeline(data, file_name)
+    flt = KpiFilter(start_date=start, end_date=end, countries=countries)
+    ctx = ReportContext(flt=flt, names=names, validation=validation, cleaning=cleaning)
+    return build_excel(df, ctx) if kind == "xlsx" else build_pdf(df, ctx)
+
+
+def page_downloads(source: tuple[bytes, str], flt: KpiFilter) -> None:
+    st.title("Report downloads")
+    st.write("Reports use the current sidebar filters.")
+    stamp = pd.Timestamp.today().strftime("%Y-%m-%d")
+    args = (flt.start_date, flt.end_date, tuple(flt.countries), *source)
+    c = st.columns(2)
+    c[0].download_button("Download Excel report", _report_bytes("xlsx", *args), f"sales_report_{stamp}.xlsx",
+                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    c[1].download_button("Download PDF report", _report_bytes("pdf", *args), f"sales_report_{stamp}.pdf",
+                         "application/pdf")
+
+
 def main() -> None:
     source = get_source()
     page = st.sidebar.radio("Page", PAGES)
@@ -187,6 +220,10 @@ def main() -> None:
         page_customers(df, names, flt)
     elif page == "Geographic analytics":
         page_geography(df, names, flt)
+    elif page == "Data quality":
+        page_quality({"ingestion": ingestion, "validation": validation, "cleaning": cleaning})
+    elif page == "Report downloads":
+        page_downloads(source, flt)
     else:
         st.title(page)
         st.info("This page is coming in the next step.")
