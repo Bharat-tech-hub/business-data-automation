@@ -1,4 +1,19 @@
-﻿# Development Log
+﻿# Development Log 
+
+## Milestone 13 (part 1): README and repository cleanup (complete)
+
+**Date:** 2026-11-18
+
+### Completed
+- `README.md`: status updated; new sections Usage, Dashboard pages, Reports, Testing, Project structure, Known limitations, Troubleshooting (Windows Smart App Control / pyarrow) and License. Page descriptions checked against the headings in `app/streamlit_app.py`.
+- Removed five redundant `.gitkeep` files from folders that now hold real files (`app`, `config`, `src`, `tests`, `notebooks`). The `.gitkeep` files in `data/*`, `reports` and `logs` stay.
+- Reviewed `.gitignore` and `git ls-files`: raw data, `.venv`, caches, reports and logs are not tracked.
+
+### Known limitations
+- No LICENSE chosen yet (README says so).
+- `verify_environment.py` has not been revisited.
+- `make_df` is duplicated in three test files.
+- Streamlit pages have no automated tests (documented in the README). 
 
 ## Milestone 12 (part 1): test hardening (complete)
 

@@ -2,7 +2,7 @@
 
 A modular Python application that ingests business sales data (CSV/Excel), validates and cleans it, computes business KPIs, and produces interactive dashboards plus downloadable Excel and PDF reports.
 
-**Status:** under development (Milestone 1: environment setup).
+**Status:** core features complete (ingestion, validation, cleaning, KPIs, analytics, charts, Excel and PDF reports, Streamlit dashboard, automated tests); final documentation in progress.
 
 ## Requirements
 
@@ -23,7 +23,78 @@ python verify_environment.py
 UCI Online Retail dataset: https://archive.ics.uci.edu/dataset/352/online+retail
 Place the downloaded file in `data/raw/` (not committed to Git).
 
-More documentation (business rules, architecture, usage) will be added as the project progresses.
+## Usage
+
+Start the dashboard:
+
+```powershell
+python run.py
+```
+
+It opens at http://localhost:8501. By default it uses the first CSV or XLSX file in `data/raw/`; you can also upload a file in the sidebar (CSV or XLSX, up to 50 MB).
+
+The exploratory analysis is in `notebooks/01_eda.ipynb` (open it in VS Code with the project's `.venv` kernel).
+
+## Dashboard pages
+
+- **Executive overview:** headline KPIs and monthly gross sales.
+- **Sales analytics:** monthly and quarterly trends, weekday and hour patterns.
+- **Product analytics:** top and bottom products by revenue.
+- **Customer analytics:** spend distribution, repeat customers, recency vs frequency.
+- **Geographic analytics:** revenue by country, with an option to exclude the largest market.
+- **Data quality:** validation findings and the cleaning audit trail.
+- **Report downloads:** Excel and PDF reports for the current filters.
+
+The sidebar date range and country filters apply to every page and to the downloads.
+
+## Reports
+
+The Report downloads page builds, for the current filters:
+
+- an **Excel workbook** with the sheets Summary, Monthly, Products, Countries, Customers and Data quality;
+- an **A4 PDF** with the key metrics, computed observations, charts and notes.
+
+The report date is the date the report is generated. Amounts are in currency units (the dataset states no currency).
+
+## Testing
+
+```powershell
+python -m pytest -q
+```
+
+The tests cover configuration, logging, schema, ingestion, validation, cleaning, KPIs, analytics, charts, Excel and PDF reports, and the behaviour of every analytics, KPI and chart function when a filter matches no rows. The Streamlit pages are verified by hand (see Known limitations).
+
+## Project structure
+
+```text
+app/        Streamlit dashboard (streamlit_app.py)
+config/     Settings (settings.py)
+src/        ingestion, validation, cleaning, kpis, analytics, visualization, reporting, logger, schema
+tests/      pytest tests
+notebooks/  Exploratory analysis
+data/       raw/ (your input, not committed), processed/, sample/
+reports/    Generated reports (not committed)
+logs/       Log files (not committed)
+run.py      Launches the dashboard
+```
+
+## Known limitations
+
+- The Streamlit pages have no automated tests; they were checked by hand against the notebook, PDF and Excel figures.
+- The dataset states no currency, so amounts are labelled "currency units".
+- Customer figures cover only rows with a CustomerID (rule R6); about a quarter of sale rows have none.
+- Returns are cancelled invoices and are not linked to the original sales (rule R10).
+- Partial months (the last month in the data) are shown but excluded from growth rates.
+
+## Troubleshooting
+
+**`import pandas` fails with "An Application Control policy has blocked this file" (pyarrow).** Windows Smart App Control can block individual compiled files in installed packages. On the development machine it blocked the `pyarrow` 26.0.1 DLL; `pyarrow==22.0.0` loaded fine and is the version pinned in `requirements.txt`. If `pip.exe` is blocked as well, use `python -m pip` instead.
+
+## License
+
+No license has been chosen yet; all rights are reserved by default.
+
+
 
 ## BUSINESS_RULES
 
