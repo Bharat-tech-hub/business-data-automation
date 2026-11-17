@@ -12,6 +12,8 @@ A modular Python application that ingests business sales data (CSV/Excel), valid
 ## Setup (Windows, PowerShell)
 
 ```powershell
+git clone https://github.com/Bharat-tech-hub/business-data-automation.git
+cd business-data-automation
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt

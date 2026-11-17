@@ -1,5 +1,21 @@
 ﻿# Development Log 
 
+## Milestone 13 (part 2): clean-clone verification (complete)
+
+**Date:** 2026-11-18
+
+### Completed
+- Cloned the repository from GitHub into a new folder, created a fresh Python 3.12 venv and followed the README setup: `pip install -r requirements.txt` succeeded (including `pyarrow==22.0.0`), `verify_environment.py` reported all 10 libraries OK, and `python -m pytest -q` gave 190 passed with no raw data present.
+- `README.md`: Setup now starts with `git clone` and `cd business-data-automation`.
+- `verify_environment.py` reviewed; no change needed (a blocked pyarrow shows up as a failed pandas import).
+
+### Known limitations
+- No LICENSE chosen yet.
+- Streamlit pages have no automated tests (documented in the README).
+- `make_df` is duplicated in three test files. 
+
+
+
 ## Milestone 13 (part 1): README and repository cleanup (complete)
 
 **Date:** 2026-11-18
