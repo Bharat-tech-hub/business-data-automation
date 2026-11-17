@@ -1,5 +1,21 @@
 ﻿# Development Log
 
+## Milestone 11 wrap-up: RFM axis ticks and single-country observation (complete)
+
+**Date:** 2026-11-17
+
+### Completed
+- `src/visualization.py`: static RFM chart uses plain comma-formatted log ticks with minor labels hidden; interactive RFM chart uses fixed ticks 1, 2, 5, 10, 20, 50, 100, 200, 500.
+- `src/analytics.py`: `observations` omits the "largest market" sentence when only one country is in the data (it was "France ... 100.0%" when filtered).
+- `tests/test_analytics.py`: new test for the single-country rule. 148 tests pass.
+- Verified on the dashboard: RFM axis shows plain numbers; France filter drops the sentence; all countries still show "United Kingdom ... 85.1%".
+
+### Known limitations
+- The static RFM chart in the PDF was not viewed after the tick change.
+- The unfiltered Product page and the Excel Products, Countries and Customers sheets were not reviewed by eye.
+
+
+
 ## Milestone 11, step 11b-2b: Data quality and Report downloads pages (complete)
 
 **Date:** 2026-11-17
