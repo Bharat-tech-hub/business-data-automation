@@ -1,5 +1,23 @@
 ﻿# Development Log
 
+## Milestone 12 (part 1): test hardening (complete)
+
+**Date:** 2026-11-18
+
+### Completed
+- Inventory of public functions against test mentions; gaps ranked by risk.
+- `tests/test_sanitize_filename.py`: 12 parametrized cases (path separators, `..`, unsafe characters, leading dots, empty/None, unicode).
+- `tests/test_empty_selection.py`: 24 tests. A filter matching no rows does not crash any analytics, KPI or chart function; charts return figures; `compute_kpis` gives 0 orders; `observations` returns "No sales in the selected data."
+- `tests/test_report_extras.py`: 6 tests. Excel and PDF build with an empty selection; `save_report` writes bytes, sanitises names, rejects non-.xlsx/.pdf and creates missing folders.
+- No source code needed changing. 190 tests pass (was 148).
+
+### Known limitations
+- `app/streamlit_app.py` has no tests (page tests need a small fake data file; not done).
+- `kpi_rows` and `save_processed` have no direct tests; they are covered indirectly.
+- `make_df` is duplicated in three test files (candidate for a shared fixture at Milestone 13).
+
+
+
 ## Milestone 11 wrap-up: RFM axis ticks and single-country observation (complete)
 
 **Date:** 2026-11-17
